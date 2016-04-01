@@ -1,0 +1,1 @@
+SET PATH=%PATH%;C:\erl7.2.1\bin;C:\erlang\rebar-develop;C:\Program Files\Git\cmd
