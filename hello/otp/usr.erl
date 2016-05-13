@@ -39,7 +39,7 @@ stop() ->
 %add_usr(PhoneNum, CustId, Plan) when Plan==prepay; Plan==postpay ->
 %  call({add_usr, PhoneNum, CustId, Plan}).
 add_usr(PhoneNum, CustId, Plan) when Plan==prepay; Plan==postpay ->
-  gen_server:call(?MODULE, {add_user, PhoneNum, CustId, Plan}).
+  gen_server:call(?MODULE, {add_usr, PhoneNum, CustId, Plan}).
 
 %delete_usr(CustId) ->
 %  call({delete_usr, CustId}).
