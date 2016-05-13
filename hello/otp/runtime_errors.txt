@@ -1,0 +1,29 @@
+The following exception will be thrown when you send non-existent function "add_user" to gen_server:call
+The correct function is "add_usr".
+add_usr(PhoneNum, CustId, Plan) when Plan==prepay; Plan==postpay ->
+  gen_server:call(?MODULE, {add_user, PhoneNum, CustId, Plan}). % note add_user is non-existent
+
+=ERROR REPORT==== 13-May-2016::10:27:31 ===
+** Generic server usr3 terminating
+** Last message in was {add_user,700000000,0,prepay}
+** When Server state == null
+** Reason for termination ==
+** {function_clause,[{usr3,handle_call,
+                           [{add_user,700000000,0,prepay},
+                            {<0.31.0>,#Ref<0.0.4.163>},
+                            null],
+                           [{file,"usr3.erl"},{line,73}]},
+                     {gen_server,try_handle_call,4,
+                                 [{file,"gen_server.erl"},{line,629}]},
+                     {gen_server,handle_msg,5,
+                                 [{file,"gen_server.erl"},{line,661}]},
+                     {proc_lib,init_p_do_apply,3,
+                               [{file,"proc_lib.erl"},{line,240}]}]}
+** exception exit: function_clause
+     in function  usr3:handle_call/3
+        called as usr3:handle_call({add_user,700000000,0,prepay},
+                                   {<0.31.0>,#Ref<0.0.4.163>},
+                                   null)
+     in call from gen_server:try_handle_call/4 (gen_server.erl, line 629)
+     in call from gen_server:handle_msg/5 (gen_server.erl, line 661)
+     in call from proc_lib:init_p_do_apply/3 (proc_lib.erl, line 240)
