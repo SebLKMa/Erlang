@@ -17,8 +17,12 @@
 
 %start() ->
 %  start("usrDb").
+%start_link() ->
+%  start_link("usrDb").
+%% get filename from env
 start_link() ->
-  start_link("usrDb").
+  {ok, FileName} = application:get_env(dets_name),
+  start_link(FileName).
 
 %start(FileName) ->
 %  register(?MODULE, spawn(?MODULE, init, [FileName, self()])),
