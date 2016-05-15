@@ -1,0 +1,53 @@
+// create schema
+users-MacBook-Pro:mnesia user$ erl -sname switch
+
+users-MacBook-Pro:mnesia user$ erl -sname om
+(om@users-MacBook-Pro)4> net:ping('switch@users-MacBook-Pro').
+pong
+(om@users-MacBook-Pro)5> node().
+'om@users-MacBook-Pro'
+(om@users-MacBook-Pro)6> nodes().
+['switch@users-MacBook-Pro']
+(om@users-MacBook-Pro)7>
+
+(om@users-MacBook-Pro)7> mnesia:create_schema([node()|nodes()]).
+ok
+(om@users-MacBook-Pro)8> ls().
+.commands.txt.swp                   Mnesia.om@users-MacBook-Pro         
+Mnesia.switch@users-MacBook-Pro     commands.txt                        
+
+// create table
+ok
+(om@users-MacBook-Pro)9> 
+(om@users-MacBook-Pro)10> rr("usr.hrl").
+[usr]
+(om@users-MacBook-Pro)11> Fields = record_info(fields, usr).
+[msisdn,id,status,plan,services]
+(om@users-MacBook-Pro)12> application:start(mnesia).
+ok
+(om@users-MacBook-Pro)13> 
+mnesia:create_table(usr, [{disc_copies, [node()]}, {ram_copies, nodes()}, {type, set}, {attributes, Fields}, {index, [id]}]).
+
+// create record in a transaction from om@users-MacBook-Pro
+Rec = #usr{msisdn=700000003, id=3, status=enabled, plan=prepay, services=[data,sms,lbs]}.
+
+mnesia:transaction(fun() -> mnesia:write(Rec) end).
+
+// read the record from switch@users-MacBook-Pro
+application:start(mnesia).
+usr:ensure_loaded().
+rr("usr.erl").
+mnesia:transaction(fun() -> mnesia:read({usr, 700000003}) end).
+// error if not in trasaction
+mnesia:read({usr, 700000003}).
+** exception exit: {aborted,no_transaction}
+     in function  mnesia:abort/1 (mnesia.erl, line 310)
+
+// abort a transaction
+mnesia:transaction(fun() -> mnesia:abort(no_user) end).
+
+// delete record
+mnesia:transaction(fun() -> mnesia:delete({usr, 700000003}) end).
+
+
+
