@@ -9,7 +9,7 @@ do_get(#req{} = Req, Args) ->
   <title>Welcome to iserve</title>
 </head>
 <body>
-  Hello
+  Hallo Seb!
 </body>
 </html>">>}.
 

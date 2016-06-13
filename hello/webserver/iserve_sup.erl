@@ -17,8 +17,10 @@ init([]) ->
     {ok, {{one_for_one, 10, 1}, [Server]}}.
  
 get_config() ->
-    case file:consult(filename:join(code:priv_dir(iserve), "iserve.conf")) of
-        [{port, Port}] ->
+    %case file:consult(filename:join(code:priv_dir(iserve), "iserve.conf")) of
+	%	[{port, Port}] ->
+	case file:consult(filename:join(code:priv_dir("r1.0"), "iserve.conf")) of
+		{ok,[{port,Port}]} ->
             Port;
         _ ->
             8080
