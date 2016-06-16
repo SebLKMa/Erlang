@@ -45,8 +45,8 @@ request(C, Req) ->
                                method = Method,
                                uri = Path}, []);
         {error, {http_error, "\r\n"}} ->
-        request(C, Req);
-    {error, {http_error, "\n"}} ->
+			request(C, Req);
+		{error, {http_error, "\n"}} ->
             request(C, Req);
     _Other ->
         exit(normal)
@@ -55,16 +55,19 @@ request(C, Req) ->
 headers(C, Req, H) ->
     case gen_tcp:recv(C#c.sock, 0, ?server_idle_timeout) of
         {ok, {http_header, _, 'Content-Length', _, Val}} ->
+			io:format("Received: ~p~n", [Val]),
             Len = list_to_integer(Val),
             headers(C, Req#req{content_length = Len}, [{'Content-Length', Len}|H]);
         {ok, {http_header, _, 'Connection', _, Val}} ->
+			io:format("Received: ~p~n", [Val]),
             Keep_alive = keep_alive(Req#req.vsn, Val),
             headers(C, Req#req{connection = Keep_alive}, [{'Connection', Val}|H]);
         {ok, {http_header, _, Header, _, Val}} ->
+			io:format("Received: ~p~n", [Val]),
             headers(C, Req, [{Header, Val}|H]);
         {error, {http_error, "\r\n"}} ->
-        headers(C, Req, H);
-    {error, {http_error, "\n"}} ->
+			headers(C, Req, H);
+		{error, {http_error, "\n"}} ->
             headers(C, Req, H);
         {ok, http_eoh} ->
             body(C, Req#req{headers = lists:reverse(H)});
@@ -86,6 +89,7 @@ keep_alive(Vsn, KA) ->
     close.
 
 body(#c{sock = Sock} = C, Req) ->
+	io:format("Received: ~p~n", [Req]),
     case Req#req.method of
         'GET' ->
             Close = handle_get(C, Req),
