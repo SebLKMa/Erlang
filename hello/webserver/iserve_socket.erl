@@ -3,6 +3,14 @@
 -export([start_link/3]).
  
 -export([init/1]).
+
+%% exported to be able to use dbg tracer, e.g.:
+%% dbg:tracer().
+%% dbg:p(all,[c]).
+%% dbg:tp({iserve_socket, '_', '_'}, []).
+%% dbg:tpl({iserve_socket, '_', '_'}, []).
+-export([request/2, headers/3, body/2, keep_alive/2]).
+
 -include("iserve.hrl").
  
 -define(not_implemented_501, "HTTP/1.1 501 Not Implemented\r\n\r\n").
@@ -53,21 +61,24 @@ request(C, Req) ->
     end.
 
 headers(C, Req, H) ->
+    %io:format("in headers() Received: ~p~n", [H]),
     case gen_tcp:recv(C#c.sock, 0, ?server_idle_timeout) of
         {ok, {http_header, _, 'Content-Length', _, Val}} ->
-			io:format("Received: ~p~n", [Val]),
+			%io:format("in headers(match1) Received: ~p~n", [Val]),
             Len = list_to_integer(Val),
             headers(C, Req#req{content_length = Len}, [{'Content-Length', Len}|H]);
         {ok, {http_header, _, 'Connection', _, Val}} ->
-			io:format("Received: ~p~n", [Val]),
+			%io:format("in headers(match2) Received: ~p~n", [Val]),
             Keep_alive = keep_alive(Req#req.vsn, Val),
             headers(C, Req#req{connection = Keep_alive}, [{'Connection', Val}|H]);
         {ok, {http_header, _, Header, _, Val}} ->
-			io:format("Received: ~p~n", [Val]),
+			%io:format("in headers(match3) Received: ~p~n", [Val]),
             headers(C, Req, [{Header, Val}|H]);
         {error, {http_error, "\r\n"}} ->
+		    %io:format("in headers(match4) Received: ~n"),
 			headers(C, Req, H);
 		{error, {http_error, "\n"}} ->
+		    %io:format("in headers(match5) Received: ~n"),
             headers(C, Req, H);
         {ok, http_eoh} ->
             body(C, Req#req{headers = lists:reverse(H)});
@@ -89,7 +100,7 @@ keep_alive(Vsn, KA) ->
     close.
 
 body(#c{sock = Sock} = C, Req) ->
-	io:format("Received: ~p~n", [Req]),
+	%io:format("in body() Received: ~p~n", [Req]),
     case Req#req.method of
         'GET' ->
             Close = handle_get(C, Req),
