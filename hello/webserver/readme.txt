@@ -66,7 +66,7 @@ ok
 {atomic,ok}
 9> iserve:add_callback(8081, 'GET', "/", test_iserve_app, do_get).
 ok
-10> iserve:add_callback(8081, 'GET', "/index.html", module, function2).
+10>iserve:add_callback(8081, 'GET', "/helloworld.html", test_iserve_app, do_getHello).
 ok
 
 11> application:start(iserve).
